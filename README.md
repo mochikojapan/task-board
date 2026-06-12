@@ -233,7 +233,7 @@ The app deploys as a **single web service**: the build compiles the frontend,
 and in production (`NODE_ENV=production`) the backend serves the built SPA
 from `frontend/dist` on the same origin — no CORS, no second service.
 
-**Live URL:** https://task-board.up.railway.app <!-- placeholder — replace with your URL after the first deploy -->
+**Live URL:** https://task-board-production-4cf5.up.railway.app
 
 The deploy host's disk is **ephemeral** — the SQLite file is wiped on every
 deploy/restart. The server seeds itself on boot whenever the tasks table is
