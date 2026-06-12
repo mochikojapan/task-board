@@ -4,12 +4,19 @@ A lightweight Trello-style task board. Tasks live in three columns — **To Do**
 **In Progress**, **Done** — and can be created, edited, moved, and deleted. A
 stats panel summarizes counts per status and how many tasks are overdue.
 
-This repo is a monorepo with two independent apps:
+**Live demo:** https://task-board-production-4cf5.up.railway.app —
+log in with `demo@taskboard.dev` / `password123`.
+
+This repo is a monorepo with two independent apps plus deploy config:
 
 ```
 task-board/
-├── backend/    Node.js + TypeScript REST API (Express, SQLite, JWT)
-└── frontend/   React + TypeScript SPA (Vite)   ← see "Frontend" below
+├── backend/        Node.js + TypeScript REST API (Express, SQLite, JWT)
+├── frontend/       React + TypeScript SPA (Vite)
+├── package.json    root build/start scripts used by the Railway deploy
+├── railway.json    Railway service config (health check on /health)
+├── render.yaml     Render Blueprint (alternative deploy target)
+└── check.mjs       one-shot local verification: tests + build + smoke test
 ```
 
 ---
@@ -88,8 +95,9 @@ always uses relative URLs and no CORS configuration is required.
 | ---------------------- | ------------- |
 | `demo@taskboard.dev`   | `password123` |
 
-These are created by the seed script (`backend/npm run seed`) and can be changed
-via `SEED_USER_EMAIL` / `SEED_USER_PASSWORD` in `backend/.env`.
+These work on the live demo and locally (the user is created automatically on
+server boot). They can be changed via `SEED_USER_EMAIL` / `SEED_USER_PASSWORD`
+in `backend/.env`.
 
 ---
 
@@ -173,6 +181,14 @@ Frontend tests mock the API client, covering the login form (including the
 inline error on bad credentials) and the board (rendering tasks into columns,
 and the delete confirmation flow).
 
+To verify everything in one go — both test suites, the production build, and a
+smoke test against a locally booted production server (SPA serving, SPA
+fallback, auth, tasks, stats, 404s):
+
+```bash
+node check.mjs
+```
+
 ---
 
 ## Project structure
@@ -234,6 +250,7 @@ and in production (`NODE_ENV=production`) the backend serves the built SPA
 from `frontend/dist` on the same origin — no CORS, no second service.
 
 **Live URL:** https://task-board-production-4cf5.up.railway.app
+(deployed on Railway)
 
 The deploy host's disk is **ephemeral** — the SQLite file is wiped on every
 deploy/restart. The server seeds itself on boot whenever the tasks table is
