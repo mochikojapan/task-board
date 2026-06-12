@@ -227,26 +227,38 @@ error middleware, which keeps every handler free of try/catch boilerplate.
 
 ---
 
-## Deploy (Render free tier)
+## Deploy
 
-The repo ships with a [`render.yaml`](render.yaml) Blueprint that deploys the
-whole app as a **single free web service**: the build compiles the frontend,
+The app deploys as a **single web service**: the build compiles the frontend,
 and in production (`NODE_ENV=production`) the backend serves the built SPA
 from `frontend/dist` on the same origin — no CORS, no second service.
 
-**Live URL:** https://task-board.onrender.com <!-- placeholder — replace with your URL after the first deploy -->
+**Live URL:** https://task-board.up.railway.app <!-- placeholder — replace with your URL after the first deploy -->
 
-Notes on the free tier:
+The deploy host's disk is **ephemeral** — the SQLite file is wiped on every
+deploy/restart. The server seeds itself on boot whenever the tasks table is
+empty, so the demo data (18 tasks + demo user) is always there.
 
-- The instance **spins down after ~15 minutes idle**; the first request after
-  that takes ~30–60s while it cold-starts.
-- The disk is **ephemeral** — the SQLite file is wiped on every deploy or cold
-  start. The server seeds itself on boot whenever the tasks table is empty, so
-  the demo data (18 tasks + demo user) is always there.
+### Railway (railway.app)
 
-To deploy: push this repo to GitHub/GitLab, then in the Render dashboard create
-a new **Blueprint** pointing at the repo and apply it. (Step-by-step in the
-Render docs: https://render.com/docs/infrastructure-as-code)
+The repo includes a root [`package.json`](package.json) with `build`/`start`
+scripts (so Railway's builder detects the monorepo) and a
+[`railway.json`](railway.json) with the health check. To deploy:
+
+1. **New Project → Deploy from GitHub repo** and select this repo.
+2. In the service **Variables**, add:
+   - `NODE_ENV` = `production`
+   - `JWT_SECRET` = any long random string
+3. **Settings → Networking → Generate Domain** to get the public URL.
+
+Railway injects `PORT` automatically; the server reads it.
+
+### Render (alternative)
+
+A [`render.yaml`](render.yaml) Blueprint is also included: in the Render
+dashboard create a new **Blueprint** pointing at the repo and apply it.
+Note Render's free tier spins the instance down after ~15 minutes idle
+(first request after that takes ~30–60s).
 
 ---
 
